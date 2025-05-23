@@ -127,7 +127,7 @@ swap_on() {
     eval write /sys/block/zram$i/$j \$$j
   done
   mkswap $swap_device$i
-  swapon $swap_device$i
+  swapon ${priority:+"-p $priority"} $swap_device$i
   touch $vmd_lock
   (set +x
   exec </dev/null >/dev/null 2>&1
@@ -203,6 +203,7 @@ unset i
 : ${mem_total:=$(awk '/^MemTotal:/{print $2}' /proc/meminfo)}
 : ${mem_limit:=$(calc "$mem_total * $mem_percent / 100 * 1024")}
 : ${disksize:=$(calc "$mem_limit * $comp_ratio / 100")}
+: ${priority:=""}
 
 : ${max_comp_streams:=$(( $(cut -d- -f2 /sys/devices/system/cpu/present) + 1 ))}
 : ${swap_device:=$([ -d /data/adb ] && echo /dev/block/zram || echo /dev/zram)}
